@@ -353,6 +353,10 @@
     }
 
     var effectiveBase = base + extraBase
+    if (tridentMode === 'thrown' && weaponPresetEl && weaponPresetEl.value === 'trident') {
+      effectiveBase = effectiveBase - 1
+      if (effectiveBase < 0) effectiveBase = 0
+    }
 
     var result
     if (edition === 'java') {
