@@ -1,6 +1,8 @@
 # Calcforge – Minecraft Damage Calculator
 
 Calcforge is a small static site that focuses on accurate Minecraft combat maths.
+Live site: https://calcforge.net/
+
 It currently ships with a Minecraft Damage Calculator for both Java and Bedrock
 editions, plus supporting content pages (about, terms, privacy, contact,
 disclaimer).
@@ -43,4 +45,3 @@ The site uses Google Analytics 4 via `gtag.js` with the measurement ID
 
 Legal and contact pages include `meta name="robots" content="noindex,follow"`
 to avoid wasting crawl budget while keeping internal links crawlable.
-
