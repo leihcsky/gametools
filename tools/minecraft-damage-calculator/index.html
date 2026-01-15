@@ -244,7 +244,7 @@
                   <button type="submit" class="inline-flex items-center justify-center rounded-full bg-cf-primary px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cf-primary/40 transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:ring-cf-primary">
                     Calculate damage
                   </button>
-                  <button type="button" id="reset-button" class="text-xs font-medium text-slate-600 hover:text-slate-900">
+                  <button type="button" id="reset-button" class="inline-flex items-center rounded-full border border-slate-300 bg-slate-50 px-3 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-cf-primary focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 dark:hover:text-white dark:focus-visible:ring-offset-[#05070b]">
                     Reset to defaults
                   </button>
                 </div>
@@ -253,7 +253,7 @@
             <section aria-label="Damage results" class="rounded-3xl bg-white p-5 shadow-elevated ring-1 ring-slate-200 sm:p-6 dark:bg-slate-900 dark:ring-slate-800">
               <div class="flex items-center justify-between gap-3">
                 <h2 class="text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-200">Results</h2>
-                <button type="button" id="copy-result" class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cf-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:focus-visible:ring-offset-[#05070b]">
+                <button type="button" id="copy-result" class="inline-flex items-center rounded-full bg-slate-900 px-3 py-1.5 text-[11px] font-semibold text-white shadow-sm shadow-slate-400 hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-cf-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-white dark:shadow-black/30 dark:focus-visible:ring-offset-[#05070b]">
                   Copy result
                 </button>
               </div>
@@ -290,15 +290,15 @@
                   </div>
                 </dl>
                 <p id="result-tags" class="text-[11px] text-slate-600 sm:text-xs dark:text-slate-400"></p>
-                <div id="previous-result" class="hidden rounded-2xl bg-white/60 p-3 text-[11px] text-slate-700 border border-slate-200 dark:bg-slate-800/60 dark:border-slate-700 dark:text-slate-300">
+                <div id="previous-result" class="hidden rounded-2xl bg-slate-900 p-3 text-[11px] text-slate-100 border border-slate-900 shadow-md shadow-slate-900/40 dark:bg-slate-50 dark:border-slate-200 dark:text-slate-900">
                   <div class="flex items-center justify-between">
-                    <span class="font-medium text-slate-700 dark:text-slate-300">Previous config</span>
-                    <span id="prev-context" class="text-[10px] text-slate-500 dark:text-slate-400"></span>
+                    <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-200 dark:text-slate-700">Previous config</span>
+                    <span id="prev-context" class="inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-100 dark:bg-slate-200 dark:text-slate-800"></span>
                   </div>
-                  <div class="mt-1 flex flex-wrap gap-3">
-                    <span id="prev-damage"></span>
-                    <span id="prev-hearts"></span>
-                    <span id="prev-hits"></span>
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    <span id="prev-damage" class="inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-100 dark:bg-slate-200 dark:text-slate-800"></span>
+                    <span id="prev-hearts" class="inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-100 dark:bg-slate-200 dark:text-slate-800"></span>
+                    <span id="prev-hits" class="inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-100 dark:bg-slate-200 dark:text-slate-800"></span>
                   </div>
                 </div>
                 <p id="result-note" class="text-[11px] leading-relaxed text-slate-600 sm:text-xs bg-yellow-50 p-3 rounded-xl border border-yellow-100 dark:bg-yellow-900/10 dark:border-yellow-900/20 dark:text-slate-400">
