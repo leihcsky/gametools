@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minecraft Damage Calculator - Java & Bedrock Edition | Calcforge</title>
+  <meta name="description" content="Accurate Minecraft Damage Calculator for Java & Bedrock (1.21+). Calculate PvP damage, Sharpness, Critical hits, and Armor reduction instantly.">
+  <link rel="canonical" href="https://calcforge.net/tools/minecraft-damage-calculator">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Minecraft Damage Calculator - Java & Bedrock Edition | Calcforge">
+  <meta property="og:description" content="Calculate Minecraft damage with version-aware formulas for Java and Bedrock. See final damage, hearts lost, and armor reduction instantly.">
+  <meta property="og:url" content="https://calcforge.net/tools/minecraft-damage-calculator">
+  <meta property="og:site_name" content="Calcforge">
+  <meta name="theme-color" content="#f5f5f7">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0HHBDEVG14"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0HHBDEVG14');
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Minecraft Damage Calculator",
+      "applicationCategory": "GameTool",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A precise damage calculator for Minecraft Java and Bedrock editions, considering enchantments, armor, and critical hits.",
+      "featureList": "Calculate damage per hit, Armor reduction, Sharpness and Strength effects, Java vs Bedrock formulas"
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://calcforge.net/"
+      },{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Tools",
+        "item": "https://calcforge.net/tools/"
+      },{
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Minecraft Damage Calculator",
+        "item": "https://calcforge.net/tools/minecraft-damage-calculator"
+      }]
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "How does Sharpness affect damage in Java vs Bedrock?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In Java Edition, Sharpness adds 0.5 * level + 0.5 damage. In Bedrock Edition, Sharpness adds a flat 1.25 damage per level. This means Sharpness V adds 3 damage in Java but 6.25 damage in Bedrock."
+        }
+      }, {
+        "@type": "Question",
+        "name": "Does Armor Toughness matter for PvP?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, but only in Java Edition. Armor Toughness reduces the amount of armor penetration from high-damage attacks (like critical hits from a Netherite Axe). In Bedrock Edition, Toughness does not exist, and armor provides a fixed reduction."
+        }
+      }, {
+        "@type": "Question",
+        "name": "How do critical hits work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A critical hit occurs when you attack while falling. It multiplies your melee damage by 1.5x. Note that in Java Edition, the critical multiplier applies after Strength bonuses, making Strength potions extremely powerful when combined with crits."
+        }
+      }, {
+        "@type": "Question",
+        "name": "What is the best enchantment for damage?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sharpness V is generally the best all-around enchantment. However, Smite V deals significantly more damage to undead mobs (Zombies, Skeletons, Withers), and Bane of Arthropods V deals massive damage to spiders."
+        }
+      }]
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'cf-bg': '#f5f5f7',
+            'cf-surface': '#ffffff',
+            'cf-card': '#ffffff',
+            'cf-primary': '#0a84ff',
+            'cf-primary-soft': '#e5f1ff',
+            'cf-accent': '#30d158',
+            'cf-muted': '#6e6e73'
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Segoe UI', 'sans-serif']
+          },
+          boxShadow: {
+            elevated: '0 18px 45px rgba(0,0,0,0.45)'
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body class="min-h-screen bg-cf-bg text-slate-900 font-sans antialiased text-[15px] sm:text-[16px] dark:bg-[#05070b] dark:text-slate-50">
+  <div class="flex min-h-screen flex-col">
+    <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-[#05070b]/90">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        <a href="/" class="flex items-center gap-2">
+          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cf-primary to-sky-400 text-xs font-semibold text-white shadow-md shadow-cf-primary/40">CF</span>
+          <span class="flex flex-col leading-tight">
+            <span class="text-sm font-semibold tracking-wide text-slate-900 dark:text-slate-50">Calcforge</span>
+            <span class="text-xs text-cf-muted dark:text-slate-400">Gaming Tools & Calculators</span>
+          </span>
+        </a>
+        <div class="flex items-center gap-3">
+          <button id="nav-toggle" type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 shadow-sm shadow-slate-200 hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cf-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:shadow-black/40 dark:hover:border-slate-400 dark:hover:bg-slate-800 sm:hidden" aria-label="Toggle navigation">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="i-bar h-0.5 w-4 bg-current transition"></span>
+          </button>
+          <nav id="nav-menu" class="hidden items-center gap-6 text-sm font-medium text-slate-700 sm:flex dark:text-slate-200">
+            <a href="/" class="rounded-full px-3 py-1.5 text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-slate-50">Home</a>
+            <a href="/tools/minecraft-damage-calculator/" class="rounded-full px-3 py-1.5 text-slate-900 ring-1 ring-cf-primary/40 bg-cf-primary-soft shadow-sm shadow-cf-primary/20 dark:text-slate-50 dark:bg-cf-primary/20">Damage Calculator</a>
+          </nav>
+          <button type="button" class="js-theme-toggle inline-flex xl:hidden h-9 items-center rounded-full border border-slate-300 bg-white px-3 text-xs font-medium text-slate-700 shadow-sm shadow-slate-200 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-cf-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:shadow-black/40 dark:hover:border-slate-400 dark:hover:bg-slate-800 dark:hover:text-white dark:focus-visible:ring-offset-[#05070b]">
+            Light
+          </button>
+        </div>
+      </div>
+      <button type="button" class="js-theme-toggle absolute right-4 top-1/2 -translate-y-1/2 hidden xl:inline-flex h-9 items-center rounded-full border border-slate-300 bg-white px-3 text-xs font-medium text-slate-700 shadow-sm shadow-slate-200 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-cf-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:shadow-black/40 dark:hover:border-slate-400 dark:hover:bg-slate-800 dark:hover:text-white dark:focus-visible:ring-offset-[#05070b]">
+        Light
+      </button>
+      <nav id="nav-menu-mobile" class="mx-auto hidden max-w-6xl px-4 pb-4 sm:hidden">
+        <div class="space-y-1 rounded-2xl border border-slate-200 bg-white p-2 text-sm font-medium text-slate-800 shadow-lg shadow-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:shadow-black/40">
+          <a href="/" class="block rounded-xl px-3 py-2 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-50">Home</a>
+          <a href="/tools/minecraft-damage-calculator/" class="block rounded-xl px-3 py-2 bg-cf-primary-soft text-slate-900 dark:bg-cf-primary/20 dark:text-slate-50">Minecraft Damage Calculator</a>
+        </div>
+      </nav>
+    </header>
+    <main class="flex-1">
+      <section class="border-b border-slate-200 bg-gradient-to-b from-white via-cf-bg to-cf-bg dark:border-slate-800 dark:from-slate-950 dark:via-[#05070b] dark:to-[#05070b]">
+        <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-18">
+          <div class="max-w-3xl">
+            <h1 class="text-balance text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl dark:text-slate-50">
+              Minecraft Damage Calculator
+            </h1>
+            <p class="mt-4 max-w-xl text-sm text-slate-700 sm:text-base dark:text-slate-300">
+              Calculate final damage, hearts lost, and armor reduction instantly. Choose your edition, set up your weapon and armor, and get numbers you can rely on.
+            </p>
+          </div>
+          <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.3fr),minmax(0,1fr)]">
+            <section aria-label="Damage calculator" class="rounded-3xl bg-white p-5 shadow-elevated ring-1 ring-slate-200 sm:p-6 dark:bg-slate-900 dark:ring-slate-800">
+              <h2 class="text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-200">Damage Calculator</h2>
+              <form id="damage-form" class="mt-4 space-y-6">
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="space-y-2">
+                    <label for="edition" class="block text-xs font-medium text-slate-800 sm:text-sm dark:text-slate-300">Edition</label>
+                    <select id="edition" name="edition" class="block w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm shadow-slate-100 outline-none ring-0 focus:border-cf-primary focus:ring-1 focus:ring-cf-primary dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100 dark:shadow-none">
+                      <option value="java" selected>Java</option>
+                      <option value="bedrock">Bedrock</option>
+                    </select>
+                  </div>
+                  <div class="space-y-2">
+                    <label for="weapon-preset" class="block text-xs font-medium text-slate-800 sm:text-sm dark:text-slate-300">Weapon Preset</label>
+                    <select id="weapon-preset" name="weapon-preset" class="block w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm shadow-slate-100 outline-none ring-0 focus:border-cf-primary focus:ring-1 focus:ring-cf-primary dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100 dark:shadow-none">
+                      <option value="custom">Custom Value</option>
+                      <optgroup label="Swords">
+                        <option value="netherite_sword">Netherite Sword (8)</option>
+                        <option value="diamond_sword">Diamond Sword (7)</option>
+                        <option value="iron_sword">Iron Sword (6)</option>
+                      </optgroup>
+                      <optgroup label="Axes (Java)">
+                        <option value="netherite_axe">Netherite Axe (10)</option>
+                        <option value="diamond_axe">Diamond Axe (9)</option>
+                      </optgroup>
+                      <optgroup label="Others">
+                        <option value="trident">Trident (9)</option>
+                        <option value="mace_smash">Mace Smash (50)</option>
+                      </optgroup>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="space-y-2">
+                    <label for="base-damage" class="block text-xs font-medium text-slate-800 sm:text-sm dark:text-slate-300">Base weapon damage (HP)</label>
+                    <input id="base-damage" name="base-damage" type="number" min="0" step="0.1" value="7" class="block w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm shadow-slate-100 outline-none ring-0 focus:border-cf-primary focus:ring-1 focus:ring-cf-primary dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100 dark:shadow-none">
+                    <p class="text-[11px] text-cf-muted dark:text-slate-500">Base damage including tool bonus (e.g., Diamond Sword = 7 or 8).</p>
+                  </div>
+                  <div class="space-y-2">
+                    <label for="sharpness" class="block text-xs font-medium text-slate-800 sm:text-sm dark:text-slate-300">Sharpness level</label>
+                    <input id="sharpness" name="sharpness" type="number" min="0" max="5" step="1" value="5" class="block w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm shadow-slate-100 outline-none ring-0 focus:border-cf-primary focus:ring-1 focus:ring-cf-primary dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100 dark:shadow-none">
+                    <p class="text-[11px] text-cf-muted dark:text-slate-500">Set to 0 if your weapon does not have Sharpness.</p>
+                  </div>
+                </div>
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium text-slate-800 sm:text-sm dark:text-slate-300">Critical hit</label>
+                    <div class="flex items-center gap-3 rounded-2xl border border-slate-300 bg-white px-3 py-2.5 dark:bg-slate-950 dark:border-slate-700">
+                      <input id="critical" name="critical" type="checkbox" class="h-4 w-4 rounded border-slate-400 bg-white text-cf-primary focus:ring-cf-primary dark:bg-slate-900 dark:border-slate-600">
+                      <label for="critical" class="text-xs text-slate-800 sm:text-sm dark:text-slate-300">Enable critical hit</label>
+                    </div>
+                    <p class="text-[11px] text-cf-muted dark:text-slate-500">Java: Jump attack. Bedrock: Jump attack.</p>
+                  </div>
+                  <div class="space-y-2">
+                    <label for="strength" class="block text-xs font-medium text-slate-800 sm:text-sm dark:text-slate-300">Strength effect level</label>
+                    <input id="strength" name="strength" type="number" min="0" max="5" step="1" value="0" class="block w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm shadow-slate-100 outline-none ring-0 focus:border-cf-primary focus:ring-1 focus:ring-cf-primary dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100 dark:shadow-none">
+                    <p class="text-[11px] text-cf-muted dark:text-slate-500">Strength I = 1, Strength II = 2.</p>
+                  </div>
+                </div>
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="space-y-2">
+                    <label for="armor" class="block text-xs font-medium text-slate-800 sm:text-sm dark:text-slate-300">Target armor points</label>
+                    <input id="armor" name="armor" type="range" min="0" max="30" step="1" value="20" class="w-full accent-cf-primary">
+                    <div class="flex justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                      <span id="armor-value">Armor: 20</span>
+                      <span>0 no armor · 20 full diamond</span>
+                    </div>
+                  </div>
+                  <div class="space-y-2" id="toughness-container">
+                    <label for="toughness" class="block text-xs font-medium text-slate-800 sm:text-sm dark:text-slate-300">Armor toughness</label>
+                    <input id="toughness" name="toughness" type="number" min="0" max="20" step="0.5" value="2" class="block w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm shadow-slate-100 outline-none ring-0 focus:border-cf-primary focus:ring-1 focus:ring-cf-primary dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100 dark:shadow-none">
+                    <p class="text-[11px] text-cf-muted dark:text-slate-500">Diamond/Netherite only. Not used in Bedrock.</p>
+                  </div>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <button type="submit" class="inline-flex items-center justify-center rounded-full bg-cf-primary px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cf-primary/40 transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:ring-cf-primary">
+                    Calculate damage
+                  </button>
+                  <button type="button" id="reset-button" class="text-xs font-medium text-slate-600 hover:text-slate-900">
+                    Reset to defaults
+                  </button>
+                </div>
+              </form>
+            </section>
+            <section aria-label="Damage results" class="rounded-3xl bg-white p-5 shadow-elevated ring-1 ring-slate-200 sm:p-6 dark:bg-slate-900 dark:ring-slate-800">
+              <div class="flex items-center justify-between gap-3">
+                <h2 class="text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-200">Results</h2>
+                <button type="button" id="copy-result" class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cf-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:focus-visible:ring-offset-[#05070b]">
+                  Copy result
+                </button>
+              </div>
+              <div class="mt-4 space-y-4">
+                <div class="grid grid-cols-3 gap-3 text-center text-xs text-slate-700 sm:text-sm dark:text-slate-300">
+                  <div class="col-span-3 rounded-2xl bg-cf-primary-soft/50 px-4 py-6 sm:col-span-1 sm:py-4 dark:bg-cf-primary/20">
+                    <p class="text-[11px] uppercase tracking-wide text-cf-primary font-bold">Final damage</p>
+                    <p id="result-damage" class="mt-1 text-3xl font-bold tracking-tight text-cf-primary sm:text-4xl">0.0</p>
+                    <p class="text-[11px] font-medium text-cf-primary/80">HP per hit</p>
+                  </div>
+                  <div class="col-span-1.5 rounded-2xl bg-slate-50 px-3 py-4 sm:col-span-1 dark:bg-slate-800">
+                    <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400">Hearts lost</p>
+                    <p id="result-hearts" class="mt-1 text-xl font-semibold text-slate-900 sm:text-2xl dark:text-slate-100">0.0</p>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">Hearts</p>
+                  </div>
+                  <div class="col-span-1.5 rounded-2xl bg-slate-50 px-3 py-4 sm:col-span-1 dark:bg-slate-800">
+                    <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400">Hits to kill</p>
+                    <p id="result-hits" class="mt-1 text-xl font-semibold text-slate-900 sm:text-2xl dark:text-slate-100">0</p>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">From 20 HP</p>
+                  </div>
+                </div>
+                <dl class="space-y-2 rounded-2xl bg-slate-50 p-4 text-xs text-slate-700 sm:text-sm dark:bg-slate-800 dark:text-slate-300">
+                  <div class="flex justify-between">
+                    <dt class="text-slate-500 dark:text-slate-400">Raw damage before armor</dt>
+                    <dd id="result-raw" class="font-medium">0.0 HP</dd>
+                  </div>
+                  <div class="flex justify-between">
+                    <dt class="text-slate-500 dark:text-slate-400">Damage reduction from armor</dt>
+                    <dd id="result-reduction" class="font-medium">0%</dd>
+                  </div>
+                  <div class="flex justify-between">
+                    <dt class="text-slate-500 dark:text-slate-400">Edition context</dt>
+                    <dd id="result-context" class="font-medium">Java</dd>
+                  </div>
+                </dl>
+                <p id="result-tags" class="text-[11px] text-slate-600 sm:text-xs dark:text-slate-400"></p>
+                <div id="previous-result" class="hidden rounded-2xl bg-white/60 p-3 text-[11px] text-slate-700 border border-slate-200 dark:bg-slate-800/60 dark:border-slate-700 dark:text-slate-300">
+                  <div class="flex items-center justify-between">
+                    <span class="font-medium text-slate-700 dark:text-slate-300">Previous config</span>
+                    <span id="prev-context" class="text-[10px] text-slate-500 dark:text-slate-400"></span>
+                  </div>
+                  <div class="mt-1 flex flex-wrap gap-3">
+                    <span id="prev-damage"></span>
+                    <span id="prev-hearts"></span>
+                    <span id="prev-hits"></span>
+                  </div>
+                </div>
+                <p id="result-note" class="text-[11px] leading-relaxed text-slate-600 sm:text-xs bg-yellow-50 p-3 rounded-xl border border-yellow-100 dark:bg-yellow-900/10 dark:border-yellow-900/20 dark:text-slate-400">
+                  Calculations use <a href="https://minecraft.wiki/w/Damage" target="_blank" rel="noopener" class="font-medium text-cf-primary hover:text-sky-600 hover:underline">official Wiki formulas</a> for Minecraft Java 1.20+ and current Bedrock combat versions.
+                </p>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+      <section class="border-t border-slate-200 bg-cf-bg dark:border-slate-800 dark:bg-[#05070b]">
+        <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+          <h2 class="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-50">How to Use</h2>
+          <div class="relative mt-8">
+            <!-- Vertical Line -->
+            <div class="absolute left-4 top-2 h-[calc(100%-2rem)] w-0.5 bg-slate-200 dark:bg-slate-800" aria-hidden="true"></div>
+
+            <!-- Step 1 -->
+            <div class="relative flex gap-8 pb-10">
+              <div class="absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-cf-primary text-sm font-bold text-white ring-4 ring-white dark:ring-[#05070b]">1</div>
+              <div class="ml-12 pt-1">
+                <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">Set the Context</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Select your Minecraft edition (Java or Bedrock) and choose a weapon preset. You can also manually input specific base damage values.</p>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="relative flex gap-8 pb-10">
+              <div class="absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-cf-primary text-sm font-bold text-white ring-4 ring-white dark:ring-[#05070b]">2</div>
+              <div class="ml-12 pt-1">
+                <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">Add Combat Details</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Configure combat variables including Sharpness enchantment levels, Critical Hit status (jump attacks), and specific potion effects.</p>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="relative flex gap-8 pb-10">
+              <div class="absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-cf-primary text-sm font-bold text-white ring-4 ring-white dark:ring-[#05070b]">3</div>
+              <div class="ml-12 pt-1">
+                <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">Define Target Defense</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Input the target's defensive stats: Armor Points, Armor Toughness (Java), and any Resistance effects to simulate realistic combat scenarios.</p>
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="relative flex gap-8">
+              <div class="absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-cf-primary text-sm font-bold text-white ring-4 ring-white dark:ring-[#05070b]">4</div>
+              <div class="ml-12 pt-1">
+                <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">Get Instant Results</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Review the calculated damage output, hearts damage, and the exact number of hits required to eliminate the target.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="border-t border-slate-200 bg-cf-bg dark:border-slate-800 dark:bg-[#05070b]">
+        <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+          <h2 class="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-50">Minecraft Weapon Base Damage Stats</h2>
+          <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-slate-200 text-sm text-left dark:divide-slate-700">
+                <thead class="bg-slate-50 text-slate-900 font-semibold dark:bg-slate-800 dark:text-slate-50">
+                  <tr>
+                    <th class="px-4 py-3 whitespace-nowrap">Weapon</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Java Edition</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Bedrock Edition</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 text-slate-700 dark:divide-slate-700 dark:text-slate-300">
+                  <tr>
+                    <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">Netherite Sword</td>
+                    <td class="px-4 py-3">8 HP (4 Hearts)</td>
+                    <td class="px-4 py-3">8 HP (4 Hearts)</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">Diamond Sword</td>
+                    <td class="px-4 py-3">7 HP (3.5 Hearts)</td>
+                    <td class="px-4 py-3">7 HP (3.5 Hearts)</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">Iron Sword</td>
+                    <td class="px-4 py-3">6 HP (3 Hearts)</td>
+                    <td class="px-4 py-3">6 HP (3 Hearts)</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">Netherite Axe</td>
+                    <td class="px-4 py-3">10 HP (5 Hearts)</td>
+                    <td class="px-4 py-3">7 HP (3.5 Hearts)</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">Diamond Axe</td>
+                    <td class="px-4 py-3">9 HP (4.5 Hearts)</td>
+                    <td class="px-4 py-3">6 HP (3 Hearts)</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">Trident</td>
+                    <td class="px-4 py-3">9 HP (4.5 Hearts)</td>
+                    <td class="px-4 py-3">9 HP (4.5 Hearts)</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">Mace</td>
+                    <td class="px-4 py-3">6 HP (Smash scales)</td>
+                    <td class="px-4 py-3">6 HP (Smash scales)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="px-4 py-3 text-xs text-slate-500 bg-slate-50 dark:bg-slate-800 dark:text-slate-400">
+              * Base damage values without enchantments. Axes in Java Edition have higher damage but slower attack speed. <a href="https://minecraft.wiki/w/Weapon" target="_blank" rel="noopener" class="ml-1 inline-flex items-center gap-0.5 font-medium text-cf-primary hover:text-sky-600 hover:underline">View full weapon list on Wiki</a>
+            </p>
+          </div>
+        </div>
+      </section>
+      <section class="border-t border-slate-200 bg-cf-bg dark:border-slate-800 dark:bg-[#05070b]">
+        <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+          <h2 class="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-50">Damage Calculation Logic</h2>
+          <div class="mt-4 grid gap-6 md:grid-cols-2">
+            <div class="rounded-2xl bg-white p-5 shadow-elevated ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+              <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Java edition</h3>
+              <p class="mt-2 text-xs leading-relaxed text-slate-700 sm:text-sm dark:text-slate-300">
+                Calculations follow the precise <strong>Java Edition combat formulas</strong>. Strength adds a flat +3 per level. Sharpness adds 0.5 * level + 0.5. Critical hits multiply the base damage (including Strength) by 1.5. Armor and Toughness reduce damage based on the high-damage mechanics introduced in 1.9. <a href="https://minecraft.wiki/w/Damage#Java_Edition" target="_blank" rel="noopener" class="inline-flex items-center gap-1 font-medium text-cf-primary hover:text-sky-600 hover:underline">Source: Minecraft Wiki <span class="i-external-link h-3 w-3"></span></a>
+              </p>
+            </div>
+            <div class="rounded-2xl bg-white p-5 shadow-elevated ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+              <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Bedrock edition</h3>
+              <p class="mt-2 text-xs leading-relaxed text-slate-700 sm:text-sm dark:text-slate-300">
+                Bedrock calculations use its unique formulas. Strength scales exponentially (approx 1.3x per level). Sharpness adds a flat +1.25 per level. Armor reduction is linear (4% per point), and Toughness is ignored. <a href="https://minecraft.wiki/w/Damage#Bedrock_Edition" target="_blank" rel="noopener" class="inline-flex items-center gap-1 font-medium text-cf-primary hover:text-sky-600 hover:underline">Source: Minecraft Wiki <span class="i-external-link h-3 w-3"></span></a>
+              </p>
+            </div>
+            <div class="rounded-2xl bg-white p-5 shadow-elevated ring-1 ring-slate-200 md:col-span-2 dark:bg-slate-900 dark:ring-slate-800">
+              <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Why no difficulty setting?</h3>
+              <p class="mt-2 text-xs leading-relaxed text-slate-700 sm:text-sm dark:text-slate-300">
+                Difficulty (Easy, Normal, Hard) only affects the damage <strong>mobs deal to players</strong>. It does not change the damage players deal to mobs or other players. This tool focuses on the damage <strong>you deal</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="border-t border-slate-200 bg-cf-bg dark:border-slate-800 dark:bg-[#05070b]">
+        <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+          <h2 class="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-50">Frequently Asked Questions</h2>
+          <dl class="mt-6 space-y-6 divide-y divide-slate-200 dark:divide-slate-800">
+            <div class="pt-6 first:pt-0">
+              <dt class="text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-50">How does Sharpness affect damage in Java vs Bedrock?</dt>
+              <dd class="mt-2 text-sm text-slate-700 leading-relaxed dark:text-slate-300">
+                In <strong>Java Edition</strong>, Sharpness adds <code>0.5 * level + 0.5</code> damage. In <strong>Bedrock Edition</strong>, Sharpness adds a flat <code>1.25</code> damage per level. This means Sharpness V adds 3 damage in Java but 6.25 damage in Bedrock.
+              </dd>
+            </div>
+            <div class="pt-6">
+              <dt class="text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-50">Does Armor Toughness matter for PvP?</dt>
+              <dd class="mt-2 text-sm text-slate-700 leading-relaxed dark:text-slate-300">
+                Yes, but only in <strong>Java Edition</strong>. Armor Toughness reduces the amount of armor penetration from high-damage attacks (like critical hits from a Netherite Axe). In Bedrock Edition, Toughness does not exist, and armor provides a fixed reduction.
+              </dd>
+            </div>
+            <div class="pt-6">
+              <dt class="text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-50">How do critical hits work?</dt>
+              <dd class="mt-2 text-sm text-slate-700 leading-relaxed dark:text-slate-300">
+                A critical hit occurs when you attack while falling. It multiplies your melee damage by 1.5x. Note that in Java Edition, the critical multiplier applies <em>after</em> Strength bonuses, making Strength potions extremely powerful when combined with crits.
+              </dd>
+            </div>
+            <div class="pt-6">
+              <dt class="text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-50">What is the best enchantment for damage?</dt>
+              <dd class="mt-2 text-sm text-slate-700 leading-relaxed dark:text-slate-300">
+                <strong>Sharpness V</strong> is generally the best all-around enchantment. However, <strong>Smite V</strong> deals significantly more damage to undead mobs (Zombies, Skeletons, Withers), and <strong>Bane of Arthropods V</strong> deals massive damage to spiders.
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+      <section class="border-t border-slate-200 bg-cf-bg dark:border-slate-800 dark:bg-[#05070b]">
+        <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+          <h2 class="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-50">Version Differences and Edge Cases</h2>
+          <div class="mt-4 space-y-3 text-sm text-slate-700 sm:text-base dark:text-slate-300">
+            <p>The tool focuses on player versus player and player versus mob melee scenarios. Extremely niche interactions, such as certain projectile or explosion edge cases, may not be fully represented but follow the same core formulas.</p>
+            <p>For highly specialized setups or if you rely on experimental features, you can use the calculator as a baseline and cross-check with in-game testing for the final few percent of precision.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-[#05070b]">
+      <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8 dark:text-slate-400">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex h-7 w-7 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a84ff] via-[#30d158] to-[#ff9f0a] text-[10px] font-semibold text-white shadow-sm shadow-slate-400">CF</span>
+          <span class="text-slate-600 dark:text-slate-300">Calcforge · Gaming tools for players who care about numbers.</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+          <span>© <span id="cf-year"></span> Calcforge</span>
+          <a href="../../about.html" class="hover:text-slate-900 dark:hover:text-slate-50">About</a>
+          <a href="../../terms.html" class="hover:text-slate-900 dark:hover:text-slate-50">Terms</a>
+          <a href="../../privacy.html" class="hover:text-slate-900 dark:hover:text-slate-50">Privacy</a>
+          <a href="../../contact.html" class="hover:text-slate-900 dark:hover:text-slate-50">Contact</a>
+          <a href="../../disclaimer.html" class="hover:text-slate-900 dark:hover:text-slate-50">Disclaimer</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+  <script src="../../assets/js/site.js"></script>
+  <script src="../../assets/js/damage-calculator.js"></script>
+</body>
+</html>
