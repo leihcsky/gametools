@@ -27,6 +27,11 @@
   var prevHitsEl = document.getElementById('prev-hits')
   var copyResultBtn = document.getElementById('copy-result')
   var resetButton = document.getElementById('reset-button')
+  var weaponAdvancedContainer = document.getElementById('weapon-advanced-container')
+  var tridentAdvancedEl = document.getElementById('trident-advanced')
+  var tridentModeEl = document.getElementById('trident-mode')
+  var maceAdvancedEl = document.getElementById('mace-advanced')
+  var maceExtraDamageEl = document.getElementById('mace-extra-damage')
 
   var lastSnapshot = null
   var currentSnapshot = null
@@ -48,11 +53,37 @@
     'iron_sword': 6,
     'stone_sword': 5,
     'wood_gold_sword': 4,
-    'netherite_axe': 10, // Java
-    'diamond_axe': 9,    // Java
-    'iron_axe': 9,       // Java
+    'netherite_axe': 10,
+    'diamond_axe': 9,
+    'iron_axe': 9,
     'trident': 9,
-    'mace_smash': 50     // Example high value
+    'mace_smash': 6
+  }
+
+  var updateWeaponAdvancedVisibility = function () {
+    if (!weaponAdvancedContainer || !weaponPresetEl) return
+    var preset = weaponPresetEl.value
+    var showTrident = preset === 'trident'
+    var showMace = preset === 'mace_smash'
+    if (showTrident || showMace) {
+      weaponAdvancedContainer.classList.remove('hidden')
+    } else {
+      weaponAdvancedContainer.classList.add('hidden')
+    }
+    if (tridentAdvancedEl) {
+      if (showTrident) {
+        tridentAdvancedEl.classList.remove('hidden')
+      } else {
+        tridentAdvancedEl.classList.add('hidden')
+      }
+    }
+    if (maceAdvancedEl) {
+      if (showMace) {
+        maceAdvancedEl.classList.remove('hidden')
+      } else {
+        maceAdvancedEl.classList.add('hidden')
+      }
+    }
   }
 
   if (weaponPresetEl && baseDamageEl) {
@@ -62,6 +93,7 @@
         baseDamageEl.value = weaponPresets[val]
         performCalculation()
       }
+      updateWeaponAdvancedVisibility()
     })
     
     // If user changes base damage manually, set preset to custom
@@ -190,6 +222,12 @@
     if (toughnessEl && params.get('toughness')) {
       toughnessEl.value = params.get('toughness')
     }
+    if (tridentModeEl && params.get('trident_mode')) {
+      tridentModeEl.value = params.get('trident_mode')
+    }
+    if (maceExtraDamageEl && params.get('mace_extra')) {
+      maceExtraDamageEl.value = params.get('mace_extra')
+    }
   }
 
   var buildResultSummary = function (snapshot, url) {
@@ -199,6 +237,15 @@
     var lines = []
     lines.push('Minecraft Damage Calculation (' + editionLabel + ')')
     lines.push('Base damage: ' + snapshot.base)
+    if (snapshot.extraBase && snapshot.extraBase > 0) {
+      lines.push('Extra base damage: ' + snapshot.extraBase)
+    }
+    if (snapshot.weaponPreset) {
+      lines.push('Weapon preset: ' + snapshot.weaponPreset)
+    }
+    if (snapshot.tridentMode) {
+      lines.push('Trident mode: ' + snapshot.tridentMode)
+    }
     lines.push('Sharpness: ' + snapshot.sharpness)
     lines.push('Critical hit: ' + critLabel)
     lines.push('Strength level: ' + snapshot.strength)
@@ -215,7 +262,7 @@
     return lines.join('\n')
   }
 
-  var updateUrlFromState = function (edition, base, sharpness, critical, strength, armor, toughness) {
+  var updateUrlFromState = function (edition, base, sharpness, critical, strength, armor, toughness, tridentMode, maceExtra) {
     if (typeof window === 'undefined') return
     if (!window.history || !window.location) return
     var params = new URLSearchParams()
@@ -227,6 +274,12 @@
     params.set('armor', String(armor))
     if (edition === 'java') {
       params.set('toughness', String(toughness))
+    }
+    if (tridentMode) {
+      params.set('trident_mode', tridentMode)
+    }
+    if (typeof maceExtra === 'number' && maceExtra > 0) {
+      params.set('mace_extra', String(maceExtra))
     }
     if (weaponPresetEl && weaponPresetEl.value && weaponPresetEl.value !== 'custom') {
       params.set('weapon', weaponPresetEl.value)
@@ -279,22 +332,33 @@
     var strength = parseInt(strengthEl.value || '0', 10)
     var armor = parseInt(armorEl.value || '0', 10)
     var toughness = parseFloat(toughnessEl.value || '0')
+    var tridentMode = null
+    if (tridentModeEl && weaponPresetEl && weaponPresetEl.value === 'trident') {
+      tridentMode = tridentModeEl.value || 'melee'
+    }
+    var extraBase = 0
+    if (maceExtraDamageEl && weaponPresetEl && weaponPresetEl.value === 'mace_smash') {
+      extraBase = parseFloat(maceExtraDamageEl.value || '0')
+    }
 
     if (base < 0) base = 0
     if (sharpness < 0) sharpness = 0
     if (strength < 0) strength = 0
     if (armor < 0) armor = 0
     if (toughness < 0) toughness = 0
+    if (extraBase < 0) extraBase = 0
 
     if (currentSnapshot) {
       lastSnapshot = currentSnapshot
     }
 
+    var effectiveBase = base + extraBase
+
     var result
     if (edition === 'java') {
-      result = calculateJavaDamage(base, sharpness, critical, strength, armor, toughness)
+      result = calculateJavaDamage(effectiveBase, sharpness, critical, strength, armor, toughness)
     } else {
-      result = calculateBedrockDamage(base, sharpness, critical, strength, armor)
+      result = calculateBedrockDamage(effectiveBase, sharpness, critical, strength, armor)
     }
 
     var finalDamage = result.finalDamage
@@ -323,7 +387,10 @@
       finalDamage: finalDamage,
       hearts: hearts,
       hits: hits,
-      reductionRatio: reductionRatio
+      reductionRatio: reductionRatio,
+      weaponPreset: weaponPresetEl && weaponPresetEl.value ? weaponPresetEl.value : 'custom',
+      tridentMode: tridentMode,
+      extraBase: extraBase
     }
 
     if (lastSnapshot) {
@@ -331,7 +398,7 @@
     }
 
     updateExplanationTags(edition, hearts, hits, reductionRatio)
-    updateUrlFromState(edition, base, sharpness, critical, strength, armor, toughness)
+    updateUrlFromState(edition, base, sharpness, critical, strength, armor, toughness, tridentMode, extraBase)
     updateNote(edition)
   }
 
@@ -341,11 +408,13 @@
       performCalculation()
       if (currentSnapshot) {
         var editionLabel = currentSnapshot.edition === 'java' ? 'java' : 'bedrock'
-        var weapon = weaponPresetEl && weaponPresetEl.value ? weaponPresetEl.value : 'custom'
+        var weapon = currentSnapshot.weaponPreset || (weaponPresetEl && weaponPresetEl.value ? weaponPresetEl.value : 'custom')
         trackCalculatorEvent('calculate_damage', {
           event_category: 'calculator',
           event_label: editionLabel,
           weapon_preset: weapon,
+          trident_mode: currentSnapshot.tridentMode || null,
+          extra_base: currentSnapshot.extraBase || 0,
           final_damage: currentSnapshot.finalDamage,
           hearts: currentSnapshot.hearts,
           hits: currentSnapshot.hits
@@ -380,6 +449,9 @@
           trackCalculatorEvent('copy_result', {
             event_category: 'calculator',
             event_label: editionLabel,
+            weapon_preset: currentSnapshot.weaponPreset || null,
+            trident_mode: currentSnapshot.tridentMode || null,
+            extra_base: currentSnapshot.extraBase || 0,
             final_damage: currentSnapshot.finalDamage,
             hearts: currentSnapshot.hearts,
             hits: currentSnapshot.hits
@@ -419,6 +491,12 @@
       strengthEl.value = '0'
       armorEl.value = '20'
       toughnessEl.value = '2'
+      if (tridentModeEl) {
+        tridentModeEl.value = 'melee'
+      }
+      if (maceExtraDamageEl) {
+        maceExtraDamageEl.value = '0'
+      }
       if (armorValueEl) {
         armorValueEl.textContent = 'Armor: ' + armorEl.value
       }
@@ -428,6 +506,7 @@
       if (prevContainerEl) {
         prevContainerEl.classList.add('hidden')
       }
+      updateWeaponAdvancedVisibility()
       if (typeof window !== 'undefined' && window.history && window.location) {
         window.history.replaceState(null, '', window.location.pathname)
       }
@@ -437,6 +516,7 @@
 
   // Initialize
   parseInitialFromQuery()
+  updateWeaponAdvancedVisibility()
   if (editionEl && toughnessContainer) {
      if (editionEl.value === 'bedrock') {
         toughnessContainer.classList.add('hidden')

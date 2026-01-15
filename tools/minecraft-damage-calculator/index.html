@@ -90,6 +90,20 @@
           "@type": "Answer",
           "text": "Sharpness V is generally the best all-around enchantment. However, Smite V deals significantly more damage to undead mobs (Zombies, Skeletons, Withers), and Bane of Arthropods V deals massive damage to spiders."
         }
+      }, {
+        "@type": "Question",
+        "name": "Does this calculator support Trident and Mace?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Trident is supported as a melee weapon with base 9 damage, and you can switch its attack type between melee and thrown in the advanced weapon settings. Mace is supported with a base 6 damage; you can add extra smash damage on top of this value to approximate fall height and Breach-style setups while the tool still applies the standard Java or Bedrock armor formulas."
+        }
+      }, {
+        "@type": "Question",
+        "name": "How can I estimate Mace smash extra damage?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The extra smash damage field is a practical shortcut for the official Mace smash formula. As a rule of thumb, you can estimate it from the blocks you fall before hitting: for the first 3 blocks, add about 4 HP per block; for the next 5 blocks, add about 2 HP per block; for any further blocks, add about 1 HP per block. Multiply this number by 1.5 if you are treating the hit as a critical smash, then enter the result as extra damage and the calculator will apply armor and toughness reduction as usual."
+        }
       }]
     }
   </script>
@@ -193,7 +207,7 @@
                       </optgroup>
                       <optgroup label="Others">
                         <option value="trident">Trident (9)</option>
-                        <option value="mace_smash">Mace Smash (50)</option>
+                        <option value="mace_smash">Mace (base 6, smash scales)</option>
                       </optgroup>
                     </select>
                   </div>
@@ -238,6 +252,26 @@
                     <label for="toughness" class="block text-xs font-medium text-slate-800 sm:text-sm dark:text-slate-300">Armor toughness</label>
                     <input id="toughness" name="toughness" type="number" min="0" max="20" step="0.5" value="2" class="block w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm shadow-slate-100 outline-none ring-0 focus:border-cf-primary focus:ring-1 focus:ring-cf-primary dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100 dark:shadow-none">
                     <p class="text-[11px] text-cf-muted dark:text-slate-500">Diamond/Netherite only. Not used in Bedrock.</p>
+                  </div>
+                </div>
+                <div id="weapon-advanced-container" class="mt-2 space-y-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-3 py-3 text-[11px] text-slate-700 hidden dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-300">
+                  <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Advanced weapon options</p>
+                  <div id="trident-advanced" class="mt-1 grid gap-3 sm:grid-cols-2 hidden">
+                    <div class="space-y-1">
+                      <label for="trident-mode" class="block text-xs font-medium text-slate-800 sm:text-sm dark:text-slate-300">Trident attack type</label>
+                      <select id="trident-mode" name="trident-mode" class="block w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 shadow-sm shadow-slate-100 outline-none ring-0 focus:border-cf-primary focus:ring-1 focus:ring-cf-primary dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100 dark:shadow-none">
+                        <option value="melee" selected>Melee (swing attack)</option>
+                        <option value="thrown">Thrown / Riptide hit</option>
+                      </select>
+                      <p class="text-[11px] text-cf-muted dark:text-slate-500">Mode is saved to the share link and summary.</p>
+                    </div>
+                  </div>
+                  <div id="mace-advanced" class="mt-1 grid gap-3 sm:grid-cols-2 hidden">
+                    <div class="space-y-1">
+                      <label for="mace-extra-damage" class="block text-xs font-medium text-slate-800 sm:text-sm dark:text-slate-300">Extra smash damage (HP)</label>
+                      <input id="mace-extra-damage" name="mace-extra-damage" type="number" min="0" step="0.5" value="0" class="block w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 shadow-sm shadow-slate-100 outline-none ring-0 focus:border-cf-primary focus:ring-1 focus:ring-cf-primary dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100 dark:shadow-none">
+                      <p class="text-[11px] text-cf-muted dark:text-slate-500">Optional extra pre-armor damage from smash height or Breach.</p>
+                    </div>
                   </div>
                 </div>
                 <div class="flex flex-wrap items-center justify-between gap-3">
@@ -321,7 +355,7 @@
               <div class="absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-cf-primary text-sm font-bold text-white ring-4 ring-white dark:ring-[#05070b]">1</div>
               <div class="ml-12 pt-1">
                 <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">Set the Context</h3>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Select your Minecraft edition (Java or Bedrock) and choose a weapon preset. You can also manually input specific base damage values.</p>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Select your Minecraft edition (Java or Bedrock) and choose a weapon preset. When you pick Trident or Mace, an advanced weapon area will appear so you can fine-tune attack type or smash damage. You can always switch back to Custom and type an exact base damage.</p>
               </div>
             </div>
 
@@ -330,7 +364,7 @@
               <div class="absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-cf-primary text-sm font-bold text-white ring-4 ring-white dark:ring-[#05070b]">2</div>
               <div class="ml-12 pt-1">
                 <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">Add Combat Details</h3>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Configure combat variables including Sharpness enchantment levels, Critical Hit status (jump attacks), and specific potion effects.</p>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Configure combat variables including Sharpness enchantment level, Critical Hit status (jump attacks), and Strength effect level. For Mace, you can also add extra smash damage on top of the base value to approximate fall height and Breach-style setups.</p>
               </div>
             </div>
 
@@ -339,7 +373,7 @@
               <div class="absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-cf-primary text-sm font-bold text-white ring-4 ring-white dark:ring-[#05070b]">3</div>
               <div class="ml-12 pt-1">
                 <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">Define Target Defense</h3>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Input the target's defensive stats: Armor Points, Armor Toughness (Java), and any Resistance effects to simulate realistic combat scenarios.</p>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Input the target's defensive stats: Armor Points and, for Java Edition, Armor Toughness. The calculator applies the correct version-specific armor formulas for both Java and Bedrock.</p>
               </div>
             </div>
 
@@ -465,6 +499,18 @@
               <dt class="text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-50">What is the best enchantment for damage?</dt>
               <dd class="mt-2 text-sm text-slate-700 leading-relaxed dark:text-slate-300">
                 <strong>Sharpness V</strong> is generally the best all-around enchantment. However, <strong>Smite V</strong> deals significantly more damage to undead mobs (Zombies, Skeletons, Withers), and <strong>Bane of Arthropods V</strong> deals massive damage to spiders.
+              </dd>
+            </div>
+            <div class="pt-6">
+              <dt class="text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-50">How do I use Trident and Mace in this calculator?</dt>
+              <dd class="mt-2 text-sm text-slate-700 leading-relaxed dark:text-slate-300">
+                Select the <strong>Trident</strong> or <strong>Mace</strong> weapon preset to reveal advanced weapon options. For Trident, you can switch the attack type between melee and thrown so your configuration and share link clearly show how you are using it. For Mace, you can add extra smash damage on top of the base 6 HP to approximate fall height and Breach-style setups while the calculator still uses the official damage and armor formulas for Java and Bedrock.
+              </dd>
+            </div>
+            <div class="pt-6">
+              <dt class="text-sm font-semibold text-slate-900 sm:text-base dark:text-slate-50">How can I estimate Mace smash extra damage?</dt>
+              <dd class="mt-2 text-sm text-slate-700 leading-relaxed dark:text-slate-300">
+                The extra smash damage field is a practical shortcut for the official Mace smash formula. As a rule of thumb, you can approximate it from the blocks you fall before hitting: for the first 3 blocks, add about 4 HP per block; for the next 5 blocks, add about 2 HP per block; for any further blocks, add about 1 HP per block. Multiply this by 1.5 if you are treating the hit as a critical smash. Enter the resulting value as extra damage and the calculator will then apply armor and toughness reduction as usual.
               </dd>
             </div>
           </dl>
